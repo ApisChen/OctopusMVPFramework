@@ -1,5 +1,6 @@
 package cn.octopus.core.service;
 
+import cn.octopus.core.utils.ClazzUtil;
 import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
@@ -75,12 +76,7 @@ public abstract class Api<T> {
                 .addConverterFactory(GsonConverterFactory.create(gsonBuilder.create()))
                 .build();
 
-        /*
-         * Get the generic class, which will be used in createApiService() method.
-         */
-        Type genType = getClass().getGenericSuperclass();
-        Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
-        clazzOfT = (Class) params[0];
+        clazzOfT = ClazzUtil.getClassOfT(getClass());
 
         apiService = createApiService(retrofit);
     }
