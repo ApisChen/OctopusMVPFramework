@@ -15,10 +15,10 @@ public class DemoApi extends Api<ApiService> {
         super();
     }
 
-    @Override
-    protected ApiService createApiService(Retrofit retrofit) {
-        return retrofit.create(ApiService.class);
-    }
+    //@Override
+    //protected ApiService createApiService(Retrofit retrofit) {
+    //    return retrofit.create(ApiService.class);
+    //}
 
     public static DemoApi getInstance() {
         if (api == null) {

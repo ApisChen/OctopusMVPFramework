@@ -3,6 +3,9 @@ package cn.octopus.core.service;
 import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.concurrent.TimeUnit;
 
 import cn.octopus.core.BuildConfig;
@@ -28,6 +31,7 @@ public abstract class Api<T> {
     private static final String CLIENT = "octopus-mvp-client";
 
     private T apiService;
+    private Class<T> clazzOfT;
 
     protected Api() {
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
@@ -71,10 +75,19 @@ public abstract class Api<T> {
                 .addConverterFactory(GsonConverterFactory.create(gsonBuilder.create()))
                 .build();
 
+        /*
+         * Get the generic class, which will be used in createApiService() method.
+         */
+        Type genType = getClass().getGenericSuperclass();
+        Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
+        clazzOfT = (Class) params[0];
+
         apiService = createApiService(retrofit);
     }
 
-    protected abstract T createApiService(Retrofit retrofit);
+    protected T createApiService(Retrofit retrofit) {
+        return retrofit.create(clazzOfT);
+    }
 
     /**
      * add token here.

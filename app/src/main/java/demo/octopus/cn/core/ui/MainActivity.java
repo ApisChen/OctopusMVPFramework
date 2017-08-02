@@ -20,6 +20,8 @@ public class MainActivity extends BasePresenterActivity implements UserPresentat
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        testLogin();
     }
 
     public void testLogin() {
