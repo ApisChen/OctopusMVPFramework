@@ -10,7 +10,7 @@ import retrofit2.http.Query;
  * Created by JieGuo on 2017/8/2.
  */
 
-public interface ApiService {
+public interface UserApiService {
 
     /**
      * login

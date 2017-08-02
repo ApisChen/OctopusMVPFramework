@@ -2,8 +2,9 @@ package demo.octopus.cn.core.mvp.model;
 
 import android.text.TextUtils;
 
+import cn.octopus.core.base.BaseApplication;
 import demo.octopus.cn.core.mvp.presentaion.UserPresentation;
-import demo.octopus.cn.core.service.ApiService;
+import demo.octopus.cn.core.service.UserApiService;
 import demo.octopus.cn.core.service.DemoApi;
 import demo.octopus.cn.core.service.responses.BaseResponse;
 import io.reactivex.Observable;
@@ -17,13 +18,14 @@ import io.reactivex.functions.Consumer;
  */
 public class UserModel implements UserPresentation.Model {
 
-    private ApiService apiService = DemoApi.getInstance().getService();
+    private UserApiService userApiService =
+        (UserApiService)BaseApplication.getInstance().getRetrofitService(DemoApi.class);
 
     @Override
     public Observable<BaseResponse<String>> login(
             String userName, String pwd, String encType, String verifyCode) {
 
-        return apiService.login(userName, pwd, encType, verifyCode);
+        return userApiService.login(userName, pwd, encType, verifyCode);
     }
 
     public Observable<BaseResponse<String>> changePwd(
@@ -46,7 +48,7 @@ public class UserModel implements UserPresentation.Model {
             changePwdResponse.setMessage("changed.");
             return Observable.just(changePwdResponse);
         }
-        return apiService.changePwd(username, oldPwd, currentPwd)
+        return userApiService.changePwd(username, oldPwd, currentPwd)
                 .doOnNext(new Consumer<BaseResponse<String>>() {
                     @Override
                     public void accept(BaseResponse<String> stringBaseResponse) throws Exception {
