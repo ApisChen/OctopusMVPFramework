@@ -3,9 +3,9 @@ package demo.octopus.cn.core.mvp.model;
 import android.text.TextUtils;
 
 import cn.octopus.core.base.BaseApplication;
+import demo.octopus.cn.core.DemoApplication;
 import demo.octopus.cn.core.mvp.presentaion.UserPresentation;
 import demo.octopus.cn.core.service.UserApiService;
-import demo.octopus.cn.core.service.DemoApi;
 import demo.octopus.cn.core.service.responses.BaseResponse;
 import io.reactivex.Observable;
 import io.reactivex.android.BuildConfig;
@@ -18,47 +18,49 @@ import io.reactivex.functions.Consumer;
  */
 public class UserModel implements UserPresentation.Model {
 
-    private UserApiService userApiService =
-        (UserApiService)BaseApplication.getInstance().getRetrofitService(DemoApi.class);
+  private UserApiService userApiService1 =
+      DemoApplication.getApp1ServerApi().getRetrofitService(UserApiService.class);
 
-    @Override
-    public Observable<BaseResponse<String>> login(
-            String userName, String pwd, String encType, String verifyCode) {
+  private UserApiService userApiService2 =
+      DemoApplication.getApp2ServerApi().getRetrofitService(UserApiService.class);
 
-        return userApiService.login(userName, pwd, encType, verifyCode);
+  @Override
+  public Observable<BaseResponse<String>> login(String userName, String pwd, String encType,
+      String verifyCode) {
+
+    return userApiService1.login(userName, pwd, encType, verifyCode);
+  }
+
+  public Observable<BaseResponse<String>> changePwd(String username, String oldPwd,
+      String currentPwd) {
+
+    if (TextUtils.isEmpty(username)) {
+      return Observable.error(new Exception("用户名不能为空"));
+    }
+    if (TextUtils.isEmpty(oldPwd)) {
+      return Observable.error(new Exception("旧密码不能空"));
     }
 
-    public Observable<BaseResponse<String>> changePwd(
-            String username, String oldPwd, String currentPwd) {
-
-        if (TextUtils.isEmpty(username)) {
-            return Observable.error(new Exception("用户名不能为空"));
-        }
-        if (TextUtils.isEmpty(oldPwd)) {
-            return Observable.error(new Exception("旧密码不能空"));
-        }
-
-        if (TextUtils.isEmpty(currentPwd)) {
-            return Observable.error(new Exception("当前密码不能为空"));
-        }
-
-        if (BuildConfig.DEBUG) {
-            BaseResponse<String> changePwdResponse = new BaseResponse<>();
-            changePwdResponse.setSuccess(true);
-            changePwdResponse.setMessage("changed.");
-            return Observable.just(changePwdResponse);
-        }
-        return userApiService.changePwd(username, oldPwd, currentPwd)
-                .doOnNext(new Consumer<BaseResponse<String>>() {
-                    @Override
-                    public void accept(BaseResponse<String> stringBaseResponse) throws Exception {
-                        if (stringBaseResponse.isSuccess()) {
-                            // 这里可以做存储或者其它的事情，总之model的作用就是在这一层做相关的事情。
-                            // 或者说 这里可以做其它接口的缓存数据等等功能
-                        } else {
-                            // ignore or not.
-                        }
-                    }
-                });
+    if (TextUtils.isEmpty(currentPwd)) {
+      return Observable.error(new Exception("当前密码不能为空"));
     }
+
+    if (BuildConfig.DEBUG) {
+      BaseResponse<String> changePwdResponse = new BaseResponse<>();
+      changePwdResponse.setSuccess(true);
+      changePwdResponse.setMessage("changed.");
+      return Observable.just(changePwdResponse);
+    }
+    return userApiService1.changePwd(username, oldPwd, currentPwd)
+        .doOnNext(new Consumer<BaseResponse<String>>() {
+          @Override public void accept(BaseResponse<String> stringBaseResponse) throws Exception {
+            if (stringBaseResponse.isSuccess()) {
+              // 这里可以做存储或者其它的事情，总之model的作用就是在这一层做相关的事情。
+              // 或者说 这里可以做其它接口的缓存数据等等功能
+            } else {
+              // ignore or not.
+            }
+          }
+        });
+  }
 }
